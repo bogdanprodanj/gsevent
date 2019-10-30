@@ -1,0 +1,113 @@
+swagger: "2.0"
+info:
+  title: GS Event API
+  description: |
+    This API is responsible for collecting events coming from mobile SDKs
+    and store them for further processing.
+  version: 1.0.0
+host: localhost:8080
+schemes:
+  - http
+paths:
+  /events:
+    post:
+      summary: Create event.
+      consumes:
+        - application/json
+      parameters:
+        - in: body
+          name: Event
+          description: Event object to be created
+          required: true
+          schema:
+            $ref: "#/definitions/Event"
+      responses:
+        202:
+          description: Accepted
+        400:
+          description: Invalid input
+        500:
+          description: Internal error
+  /events/{event_type}:
+    get:
+      summary: Find events by 'event_type' and time range/interval.
+      produces:
+        - application/json
+      parameters:
+        - name: event_type
+          in: path
+          required: true
+          type: string
+          description: Type of the event
+        - name: start
+          in: query
+          required: false
+          type: integer
+          description: beggining of the time interval in UNIX format
+          default: 0
+        - name: end
+          in: query
+          required: false
+          type: integer
+          description: end of the time interval in UNIX format, defaults to current time
+      responses:
+        200:
+          description: List of aggregated data
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Data"
+        500:
+          description: Internal error
+  /events/{event_type}/count:
+    get:
+      summary: Counts the number of events fot specific type and time range/interval.
+      produces:
+        - text/plain
+      parameters:
+        - name: event_type
+          in: path
+          required: true
+          type: string
+          description: Type of the event
+        - name: start
+          in: query
+          required: false
+          type: integer
+          description: beggining of the time interval in UNIX format
+          default: 0
+        - name: end
+          in: query
+          required: false
+          type: integer
+          description: end of the time interval in UNIX format, defaults to current time
+      responses:
+        200:
+          description: Number of events
+          schema:
+            type: integer
+        500:
+          description: Internal error
+definitions:
+  Event:
+    allOf:
+      - $ref: '#/definitions/Data'
+      - type: object
+        properties:
+          event_type:
+            type: string
+            description: this refers to the type of event being sent,such as 'session_start', 'session_end', 'link_clicked', etc
+  Data:
+    type: object
+    required:
+      - ts
+      - params
+    properties:
+      ts:
+        description: UNIX timestamp in seconds
+        type: integer
+      params:
+        description: A key-value dictionary where the key must be a string but the value can be of any data type
+        type: object
+        additionalProperties:
+          type: object
