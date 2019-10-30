@@ -14,17 +14,23 @@ Detailed documentation is available in _swagger.yaml_ file in the root of the re
 
 1) Install the necessary dependencies and libraries
 
-    `$ make init`
+    ```
+    $ make init
+    ```
 
 2) Generate necessary the code
 
-    `$ make generate-swagger`
+    ```
+    $ make generate-swagger
+    ```
 
 3) Start the application
-
-    `$ docker-compose up -d`
+    
+    ```
+    $ docker-compose up -d
+    ```
 
 To init and start the service with one command:
-
-    `$ make run`
+    
+    $ make run
 
