@@ -86,6 +86,26 @@ func TestAddEvent(t *testing.T) {
 	})
 }
 
+func TestListEvents(t *testing.T) {
+	logrus.SetOutput(ioutil.Discard)
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	mockRedis := mocks.NewMockCacher(ctrl)
+	app := App{redis: mockRedis}
+	requestCtx := &fasthttp.RequestCtx{}
+	requestCtx.Request.SetRequestURI("/events")
+	t.Run("happy path", func(t *testing.T) {
+		mockRedis.EXPECT().ListEvents().Return([]string{"foo", "bar"}, nil)
+		app.ListEvents(requestCtx)
+		assert.Equal(t, string(requestCtx.Response.Body()), `["foo","bar"]`)
+	})
+	t.Run("cache internal error", func(t *testing.T) {
+		mockRedis.EXPECT().ListEvents().Return(nil, errors.New("some error"))
+		app.ListEvents(requestCtx)
+		assert.Equal(t, requestCtx.Response.StatusCode(), fasthttp.StatusInternalServerError)
+	})
+}
+
 func TestEventCount(t *testing.T) {
 	logrus.SetOutput(ioutil.Discard)
 	ctrl := gomock.NewController(t)
