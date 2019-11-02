@@ -112,6 +112,6 @@ func TestGetEventData(t *testing.T) {
 	}}, nil)
 	requestCtx := &fasthttp.RequestCtx{}
 	requestCtx.Request.SetRequestURI("/events/hello")
-	app.GetEventData(requestCtx)
+	app.EventData(requestCtx)
 	assert.Equal(t, string(requestCtx.Response.Body()), fmt.Sprintf(`[{"params":{"name":"foo"},"ts":%d}]`, ts))
 }

@@ -35,6 +35,11 @@ func (r *Redis) AddEvent(e *models.Event) error {
 	}).Err()
 }
 
+// ListEvents returns list of existing events types
+func (r *Redis) ListEvents() ([]string, error) {
+	return r.client.Keys("*").Result()
+}
+
 // EventData returns list of data for provided event type and time range
 func (r *Redis) EventData(eventType string, start, end int) ([]models.Data, error) {
 	var data []models.Data

@@ -44,8 +44,26 @@ func (a *App) AddEvent(ctx *fasthttp.RequestCtx) {
 	ctx.SetStatusCode(fasthttp.StatusAccepted)
 }
 
-// GetEventData returns list of data for provided event type and time range
-func (a *App) GetEventData(ctx *fasthttp.RequestCtx) {
+// ListEvents returns list of all types of events
+func (a *App) ListEvents(ctx *fasthttp.RequestCtx) {
+	events, err := a.redis.ListEvents()
+	if err != nil {
+		logrus.WithError(err).Error("failed to list events")
+		ctx.Error("failed to list events", http.StatusInternalServerError)
+		return
+	}
+	body, err := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(events)
+	if err != nil {
+		logrus.WithError(err).Error("failed to get marshal list of events")
+		ctx.Error("failed to get list of events", http.StatusInternalServerError)
+		return
+	}
+	ctx.SetStatusCode(fasthttp.StatusOK)
+	ctx.SetBody(body)
+}
+
+// EventData returns list of data for provided event type and time range
+func (a *App) EventData(ctx *fasthttp.RequestCtx) {
 	end := ctx.QueryArgs().GetUintOrZero(endQueryParam)
 	if end == 0 {
 		end = int(time.Now().Unix())
@@ -58,7 +76,7 @@ func (a *App) GetEventData(ctx *fasthttp.RequestCtx) {
 	}
 	body, err := jsoniter.ConfigCompatibleWithStandardLibrary.Marshal(data)
 	if err != nil {
-		logrus.WithError(err).Error("failed to get marshal events data")
+		logrus.WithError(err).Error("failed to marshal events data")
 		ctx.Error("failed to get events data", http.StatusInternalServerError)
 		return
 	}

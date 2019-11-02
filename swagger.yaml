@@ -28,6 +28,17 @@ paths:
           description: Invalid input
         500:
           description: Internal error
+    get:
+      summary: List of all events
+      produces:
+        - application/json
+      responses:
+        200:
+          description: List of events
+          schema:
+            type: array
+            items:
+              type: string
   /events/{event_type}:
     get:
       summary: Find events by 'event_type' and time range/interval.

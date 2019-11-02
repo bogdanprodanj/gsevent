@@ -58,6 +58,7 @@ func (a *App) Stop() {
 
 func (a *App) registerRoutes() {
 	a.Router.POST("/events", a.AddEvent)
-	a.Router.GET("/events/:event_type", a.GetEventData)
+	a.Router.GET("/events", a.ListEvents)
+	a.Router.GET("/events/:event_type", a.EventData)
 	a.Router.GET("/events/:event_type/count", a.EventCount)
 }
